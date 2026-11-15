@@ -5,9 +5,13 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Sun, Moon, Send, Sparkles } from "lucide-react";
 
-// WARNING: This API key is exposed in the frontend code. 
-// For production, use a backend service to handle API calls securely.
-const GEMINI_API_KEY = 'AIzaSyBplY0RSE1ESUv6fqWIKcnInIFN-xcqviE';
+// The Gemini API key is read from the environment (Vite exposes only
+// VITE_* variables to the browser). Never hardcode a key here — set
+// VITE_GEMINI_API_KEY in a local .env file (gitignored) or in your hosting
+// provider's environment variables (e.g. Vercel → Settings → Environment
+// Variables). Note: a browser-side key is still visible to anyone who opens
+// DevTools; for production, move API calls behind a backend service.
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
 const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 interface Message {
@@ -85,6 +89,9 @@ export default function Index() {
   }, [messages]);
 
   const sendToGemini = async (message: string): Promise<string> => {
+    if (!GEMINI_API_KEY) {
+      return 'Missing Gemini API key. Set VITE_GEMINI_API_KEY in your environment to enable the AI opponent.';
+    }
     try {
       const debateTopic = selectedTopic || customTopic;
       const systemPrompt = `You are participating in a debate about: "${debateTopic}". 
@@ -149,7 +156,6 @@ Keep responses concise (2-3 sentences). Be respectful but firm in your position.
 
     const aiResponse = await sendToGemini(input);
     const aiMessage: Message = { role: 'assistant', content: aiResponse };
-    
     setMessages(prev => [...prev, aiMessage]);
     setScore(prev => ({ ...prev, user: prev.user + 1 }));
     setIsLoading(false);
