@@ -43,7 +43,7 @@ npm run lint     # eslint
 
 ## Configuration
 
-The app calls the Gemini API directly from the browser. The API key lives in `src/pages/Index.tsx` (`GEMINI_API_KEY`) — replace it with your own key from Google AI Studio. Never commit a production key; for production, move API calls behind a backend service.
+The app calls the Gemini API directly from the browser. The key is read from the `VITE_GEMINI_API_KEY` environment variable — set it in a local `.env` file (gitignored, never commit it) for development, or in your hosting provider's environment variables (e.g. Vercel → Settings → Environment Variables) for deployment. A browser-side key is still visible to anyone who opens DevTools; for production, move API calls behind a backend service.
 
 ## Deployment
 
